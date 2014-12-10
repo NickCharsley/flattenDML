@@ -5,18 +5,72 @@
  * and open the template in the editor.
  */
 
+function buildXPath($path)
+{
+    if (count($path)==1) {
+        return "//*[@name='".$path[0]."']";
+    }
+    $xpath="";
+    if ($path[0]=="BSB") {
+        $xpath.="/xs:schema/*/*/*[@name='".$path[1]."']";
+        unset($path[1]);
+    } else {
+        $xpath.="/*/*/*[@name='".$path[0]."']";
+    }
+    unset($path[0]);
+    return $xpath.buildXPath(array_values($path));
+}
 
-function fieldLengths($xmlFile,$fields){
+function mapFieldName($field){
+    return explode(
+        '_', 
+        str_replace('_OIA', '_OIA_OIA',$field[1]).
+        '_'.
+        $field[2]            
+    );
+}
+
+function buildSQLRow($field,$value)
+{
+    return "alter table ["
+        .$field[0]
+        ."].["
+        .$field[1]
+        ."] alter column ["
+        .$field[2]
+        ."] varchar("
+        .(($value>100)?'MAX':max($value, 4))
+        .");\n";    
+}
+
+function fieldLengths($xmlFile, $fields)
+{
     if (file_exists($xmlFile)) {
         $doc = new DOMDocument();
         $doc->loadXML(file_get_contents($xmlFile));
-        
+                
         $xpath = new DOMXpath($doc);
-        // example 1: for everything with an id
-        $elements = $xpath->query("//*[@name='OVERALL']");
-        foreach($elements as $node) {
-            print_r($node);
+        $sql=[];
+        foreach ($fields as $field) {
+            if (substr($field[2],-3)=='_KF'){
+                $sql[]=  buildSQLRow($field, 16)."--!!!Override value\n";
+            } else {
+                $query=buildXPath(mapFieldName($field));
+                $elements = $xpath->query($query."//xs:maxInclusive/@value");
+                if ($elements->length>0) {
+                    $sql[]=  buildSQLRow($field, strlen($elements->item(0)->value));
+                } else {
+                    $elements = $xpath->query($query."//xs:maxLength/@value");
+                    if ($elements->length>0) {
+                        $sql[]=  buildSQLRow($field, $elements->item(0)->value);
+                    } else {
+                        $sql[]=  buildSQLRow($field, 10)."--!!!Default value\n";
+                    }
+                }
+            }
         }
+        //print_r($sql);
+        file_put_contents("\\\\internal.vanquisbank.co.uk\\DFS1\\Home\\CharsleN\\SQL Server Management Studio\bsb.sql",$sql);
     } else {
         exit("Failed to open $xmlFile.");
     }
@@ -2342,7 +2396,7 @@ $fields=[
     ["CallCreditV2","BSB_OVERALL","CUGMEMB_L"],
 ];
 
+
 fieldLengths('T:/Exchange/CallCredit/Schemas/VanquisModifiedCallReportBSB/incBSB.xsd', $fields);
+//fieldLengths('dml/incBSB.xsd', $fields);
 
-
-?>
