@@ -1,11 +1,13 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-<xsl:param name="table">HHO</xsl:param>
+<xsl:param name="table">APPLICANT</xsl:param>
 <xsl:output method="html" indent="no"/>
 
 <xsl:template match="xs:element" mode="table">
-  <xsl:text>
-out::reformat(in)
+  <xsl:text>include "~$AI_XFR/callCreditDefaults.xfr";
+
+out :: reformat(in) =
+begin
 // Reformat </xsl:text>
   <xsl:value-of select="@name"/>
   <xsl:text>
@@ -59,6 +61,11 @@ end;</xsl:text>
   <xsl:value-of select="@name"/>
 </xsl:template>
 
+<xsl:template mode="parentName" match="xs:element[@name='APPLICANT']">
+  <xsl:text>.Applicant</xsl:text>  
+</xsl:template>
+
+
 <xsl:template mode="parentName" match="xs:element">
   <xsl:choose>
     <xsl:when test="@name='OVERALL'"/>
@@ -86,12 +93,19 @@ end;</xsl:text>
   <xsl:text> :: </xsl:text>  
   <xsl:choose>
     <xsl:when test="@memberTypes='ST_defaults ST_bit'">
-      <xsl:text>(int(4))((decimal('\0'))callCreditDefaults(in</xsl:text>
+      <xsl:text>(int)((decimal('\0'))callCreditDefaults(in</xsl:text>
       <xsl:apply-templates mode="parentName" select="../.."/>
       <xsl:text>))</xsl:text>
     </xsl:when>
-    <xsl:when test="@memberTypes='ST_defaults xs:double'">decimal('\0')</xsl:when>
-      <xsl:when test="@memberTypes='ST_defaults xs:token'">string('\0')</xsl:when>
+    <xsl:when test="@memberTypes='ST_defaults xs:double'">
+      <xsl:text>((decimal('\0'))callCreditDefaults(in</xsl:text>
+      <xsl:apply-templates mode="parentName" select="../.."/>
+      <xsl:text>))</xsl:text>
+    </xsl:when>
+      <xsl:when test="@memberTypes='ST_defaults xs:token'">
+      <xsl:text>in</xsl:text>
+      <xsl:apply-templates mode="parentName" select="../.."/>
+    </xsl:when>
     <xsl:when test="@memberTypes='ST_defaults xs:date'">
       <xsl:text>callCreditDateDefaults(in</xsl:text>
       <xsl:apply-templates mode="parentName" select="../.."/>
@@ -100,7 +114,7 @@ end;</xsl:text>
       <xsl:text>out.</xsl:text>      
       <xsl:value-of select="../../@name"/><xsl:text>_default :: callCreditDateDefaultTypes(in</xsl:text>
       <xsl:apply-templates mode="parentName" select="../.."/>
-      <xsl:text>);</xsl:text>
+      <xsl:text>)</xsl:text>
       </xsl:when>
       <xsl:when test="@memberTypes='ST_defaults'">
       <xsl:apply-templates select="xs:simpleType/*"/>
@@ -112,11 +126,14 @@ end;</xsl:text>
 <xsl:template match="xs:restriction">
   <xsl:choose>
     <xsl:when test="@base='xs:int'">
-      <xsl:text>(int(4))((decimal('\0'))callCreditDefaults(in</xsl:text>
+      <xsl:text>(int)((decimal('\0'))callCreditDefaults(in</xsl:text>
       <xsl:apply-templates mode="parentName" select="../../../.."/>
       <xsl:text>))</xsl:text>
     </xsl:when>  
-    <xsl:when test="@base='xs:string'">string('\0')</xsl:when>
+    <xsl:when test="@base='xs:string'">
+      <xsl:text>in</xsl:text>
+      <xsl:apply-templates mode="parentName" select="../../../.."/>
+    </xsl:when>
   </xsl:choose>
 </xsl:template>
 

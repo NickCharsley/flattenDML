@@ -27,8 +27,7 @@ type BSB_APPLICANT_</xsl:text>
   string('\0') searchid = NULL;
   datetime("YYYY-MM-DDTHH24:MI:SS") searchdate = NULL;
   datetime("YYYYMMDDHH24MISS") request_time = NULL;
-  string('\0')yourreference = NULL;
-</xsl:text>
+  string('\0')yourreference = NULL;</xsl:text>
 <xsl:if test="@name!='OVERALL'">
   <xsl:text>int Applicant_index = NULL;</xsl:text>
   </xsl:if><xsl:apply-templates select='xs:complexType/xs:sequence/xs:element' mode='fields'/>
@@ -60,35 +59,48 @@ type BSB_APPLICANT_</xsl:text>
 <xsl:template match="xs:element[@name='OIA']" mode='fields' />
 
 <xsl:template match="xs:element" mode='fields'>
-  <xsl:text>//</xsl:text>
+  <xsl:text>
+  //</xsl:text>
   <xsl:value-of select="@name"/>
   <xsl:apply-templates select='xs:complexType/xs:attribute'/>
   <xsl:apply-templates select='xs:complexType/xs:sequence/xs:element' mode='fields'/>
 </xsl:template>
 
 <xsl:template match="xs:attribute" >
-<xsl:text>
-  </xsl:text>
   <xsl:apply-templates select="xs:simpleType/*"/>
   <xsl:text> </xsl:text>
-  <xsl:value-of select="@name"/>;
+  <xsl:value-of select="@name"/>
+  <xsl:text> = NULL;</xsl:text>
 </xsl:template>
 
 <xsl:template match="xs:attribute[@type='xs:string']" >
   <xsl:text>
   string('\0') </xsl:text>
   <xsl:value-of select="@name"/>
-  <xsl:text>;</xsl:text>
+  <xsl:text> = NULL;</xsl:text>
 </xsl:template>
-
 
 <xsl:template match="xs:union">
 <xsl:choose>
-  <xsl:when test="@memberTypes='ST_defaults ST_bit'">int</xsl:when>
-  <xsl:when test="@memberTypes='ST_defaults xs:double'">decimal('\0')</xsl:when>
-    <xsl:when test="@memberTypes='ST_defaults xs:token'">string('\0')</xsl:when>
-  <xsl:when test="@memberTypes='ST_defaults xs:date'">string('\0') <xsl:value-of select="../../@name"/>_default;
-  date("YYYY-MM-DD")</xsl:when>
+  <xsl:when test="@memberTypes='ST_defaults ST_bit'">
+  <xsl:text>
+  int</xsl:text>
+  </xsl:when>
+  <xsl:when test="@memberTypes='ST_defaults xs:double'">
+  <xsl:text>
+  decimal('\0')</xsl:text>
+  </xsl:when>
+    <xsl:when test="@memberTypes='ST_defaults xs:token'">
+    <xsl:text>
+    string('\0')</xsl:text>
+  </xsl:when>
+  <xsl:when test="@memberTypes='ST_defaults xs:date'">
+  <xsl:text>
+  string('\0') </xsl:text>
+  <xsl:value-of select="../../@name"/>
+  <xsl:text>_default = NULL;
+  date("YYYY-MM-DD")</xsl:text>
+  </xsl:when>
   <xsl:when test="@memberTypes='ST_defaults'">
   <xsl:apply-templates select="xs:simpleType/*"/>
   </xsl:when>
@@ -98,15 +110,25 @@ type BSB_APPLICANT_</xsl:text>
 <xsl:template name="charLen">
   <xsl:param name="length"/>
   <xsl:choose>
-    <xsl:when test="$length>4"><xsl:value-of select="$length"/></xsl:when>
-    <xsl:otherwise>4</xsl:otherwise>
+    <xsl:when test="$length>4">
+      <xsl:value-of select="$length"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:text>4</xsl:text>
+    </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
 
 <xsl:template match="xs:restriction">
   <xsl:choose>
-    <xsl:when test="@base='xs:int'">int</xsl:when>  
-    <xsl:when test="@base='xs:string'">string('\0')</xsl:when>
+    <xsl:when test="@base='xs:int'">
+      <xsl:text>
+  int</xsl:text>
+    </xsl:when>  
+    <xsl:when test="@base='xs:string'">
+      <xsl:text>
+  string('\0')</xsl:text>
+    </xsl:when>
   </xsl:choose>
 </xsl:template>
 

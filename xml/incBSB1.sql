@@ -7,7 +7,6 @@
   [searchdate] [datetime] NULL,
   [request_time] [datetime] NULL,
   [yourreference] [varchar](40) NULL,
-  [Applicant_index] [int] NOT NULL,
   --MAIN
   [B] [int], --ST_defaults ST_bit
   --CUGMEMB
@@ -157,7 +156,7 @@
   --SCORE
   --MAIN
   [JF] [int],--base=xs:int, --ST_defaults
-  [KF] [varchar](4),--base=xs:string, --ST_defaults
+  [KF] [varchar](16),--base=xs:string, --ST_defaults
   [MF] [int],--base=xs:int, --ST_defaults
   [NF] [int],--base=xs:int, --ST_defaults
   [OF] [int],--base=xs:int, --ST_defaults
@@ -2140,10 +2139,10 @@
   );
   go
 
-  IF OBJECT_ID('CallCredit.BSB_OIADEC', 'U') IS NOT NULL
-    DROP TABLE [CallCredit].[BSB_OIADEC];
+  IF OBJECT_ID('CallCredit.BSB_APPLICANT_OIADEC', 'U') IS NOT NULL
+    DROP TABLE [CallCredit].[BSB_APPLICANT_OIADEC];
   go
-  CREATE TABLE [CallCredit].[BSB_OIADEC](
+  CREATE TABLE [CallCredit].[BSB_APPLICANT_OIADEC](
   [searchid] [uniqueidentifier] NOT NULL,
   [searchdate] [datetime] NULL,
   [request_time] [datetime] NULL,
@@ -2924,10 +2923,10 @@
   );
   go
 
-  IF OBJECT_ID('CallCredit.BSB_OIAUNDEC', 'U') IS NOT NULL
-    DROP TABLE [CallCredit].[BSB_OIAUNDEC];
+  IF OBJECT_ID('CallCredit.BSB_APPLICANT_OIAUNDEC', 'U') IS NOT NULL
+    DROP TABLE [CallCredit].[BSB_APPLICANT_OIAUNDEC];
   go
-  CREATE TABLE [CallCredit].[BSB_OIAUNDEC](
+  CREATE TABLE [CallCredit].[BSB_APPLICANT_OIAUNDEC](
   [searchid] [uniqueidentifier] NOT NULL,
   [searchdate] [datetime] NULL,
   [request_time] [datetime] NULL,
